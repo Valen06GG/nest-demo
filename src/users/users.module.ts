@@ -4,32 +4,31 @@ import { UsersController } from "./users.controller";
 import { UsersRepository } from "./users.repository";
 import { LoggerMiddleware } from "src/middlewares/logger.middleware";
 
-// const mockUserService = {
-//     getUsers: () => 'Esto es un servicio mock de usuarios'
-// }
+ const mockUserService = {
+     getUsers: () => 'Esto es un servicio mock de usuarios'
+ }
 
 @Module({
     providers: [
-        // {
-        //     provide: UsersService,
-        //     useValue: mockUserService,
-        // },
-        UsersService,
+         {
+             provide: UsersService,
+             useValue: mockUserService,
+        },
         UsersRepository,
-        {
-            provide: 'API_USERS',
-            useFactory: async () => {
-                const apiUsers = await fetch('https://jsonplaceholder.typicode.com/users',
-                ).then((response) => response.json());
-                return apiUsers.map(user => {
-                    return {
-                        id: user.id,
-                        name: user.name,
-                        email: user.email,
-                    };
-                });
-            }
-        }
+        // {
+        //     provide: 'API_USERS',
+        //     useFactory: async () => {
+        //         const apiUsers = await fetch('https://jsonplaceholder.typicode.com/users',
+        //         ).then((response) => response.json());
+        //         return apiUsers.map(user => {
+        //             return {
+        //                 id: user.id,
+        //                 name: user.name,
+        //                 email: user.email,
+        //             };
+        //         });
+        //     }
+        // }
     ],
     controllers: [UsersController],
 })
