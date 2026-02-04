@@ -1,18 +1,15 @@
 import { Body, Controller, Delete, Get, Headers, HttpCode, Param, Post, Put, Query, Req, Res, UseGuards, UseInterceptors } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import type { Request, Response } from "express";
-import type { User } from "./user.interface";
+import { User as UserEntity } from "./users.entity";
 import { AuthGuard } from "src/guards/auth.guards";
 import { DateAdderInterceptor } from "src/interceptors/date-adder.interceport";
+import { UsersDbService } from "./usersDB.service";
 
 @Controller("users")
 @UseGuards(AuthGuard)
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {
-
-    
-  }
-  
+  constructor(private readonly usersService: UsersService, private usersDbService: UsersDbService,) {}
   @Get()
   getUsers(@Query("name") name?: string) {
     if(name) {
@@ -59,15 +56,15 @@ export class UsersController {
 
   @Post()
   @UseInterceptors(DateAdderInterceptor)
-  createUser(@Body() user: User, @Req() request: Request & { now: string }) {
+  createUser(@Body() user: UserEntity, @Req() request: Request & { now: string }) {
     console.log("dentro del endpoint:", request.now);
-    return this.usersService.createUser(user);
+    return this.usersDbService.saveUser({...user, createdAt: request.now});
   }
 
   @Put() 
-    updateUser() {
-      return "Este endpoint crea un usuario" ;
-    }
+  updateUser() {
+    return "Este endpoint crea un usuario" ;
+  }
 
   @Delete()
   deleteUser() {

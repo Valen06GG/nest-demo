@@ -3,12 +3,17 @@ import { UsersService } from "./users.service";
 import { UsersController } from "./users.controller";
 import { UsersRepository } from "./users.repository";
 import { LoggerMiddleware } from "src/middlewares/logger.middleware";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { User } from "./users.entity";
+import { UsersDbService } from "./usersDB.service";
 
 
 
 @Module({
+    imports: [TypeOrmModule.forFeature([User])],
     providers: [
         UsersService,
+        UsersDbService,
         UsersRepository,
          {
              provide: 'API_USERS',
