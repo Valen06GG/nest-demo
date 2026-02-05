@@ -9,7 +9,19 @@ export class UsersDbService {
         @InjectRepository(User) private usersRepository: Repository<User>,
     ) {}
 
-    saveUser(user: User) {
+    saveUser(user: Omit<User, "id">) {
         this.usersRepository.save(user);
+    }
+
+    getUserById(id: string) {
+      return this.usersRepository.findOne({ where: { id } });
+    }
+
+    getUserByName(name: string) {
+      return this.usersRepository.findOne({where: { name }})
+    }
+
+    getUsers() {
+      return this.usersRepository.find();
     }
 }

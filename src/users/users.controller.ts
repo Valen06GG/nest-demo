@@ -1,10 +1,10 @@
-import { Body, Controller, Delete, Get, Headers, HttpCode, Param, Post, Put, Query, Req, Res, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Headers, HttpException, HttpStatus, NotFoundException, Param, ParseUUIDPipe, Post, Put, Query, Req, Res, UseGuards, UseInterceptors } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import type { Request, Response } from "express";
-import { User as UserEntity } from "./users.entity";
 import { AuthGuard } from "src/guards/auth.guards";
 import { DateAdderInterceptor } from "src/interceptors/date-adder.interceport";
 import { UsersDbService } from "./usersDB.service";
+import { CreateUserDto } from "./dtos/CreateUser.dto";
 
 @Controller("users")
 @UseGuards(AuthGuard)
@@ -13,9 +13,9 @@ export class UsersController {
   @Get()
   getUsers(@Query("name") name?: string) {
     if(name) {
-      return this.usersService.getUserByName(name);
+      return this.usersDbService.getUserByName(name);
     }
-    return this.usersService.getUsers();
+    return this.usersDbService.getUsers();
   }
 
   @Get("profile") 
@@ -32,10 +32,20 @@ export class UsersController {
     return "Este endpoint retorna las imágenes del usuario";
   }
   
-  @HttpCode(418)
+  // @HttpCode(418)
   @Get("coffee")
   getCoffee() {
-    return "No se hacer cafe, soy una tetera";
+    try {
+      throw new Error()
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.I_AM_A_TEAPOT,
+          error: "Envio del cafe fallido"
+        },
+        HttpStatus.I_AM_A_TEAPOT
+      );
+    }
   }
   
   @Get("message") 
@@ -50,13 +60,17 @@ export class UsersController {
   }
   
   @Get(":id")
-  getUserById(@Param("id") id: string) {
-    return this.usersService.getUserById(Number(id));
+  async getUserById(@Param("id", ParseUUIDPipe) id: string) {
+    const user = await this.usersDbService.getUserById(id);
+    if(!user) {
+      throw new NotFoundException("Usuario no encontrado");
+    }
+    return user
   }
 
   @Post()
   @UseInterceptors(DateAdderInterceptor)
-  createUser(@Body() user: UserEntity, @Req() request: Request & { now: string }) {
+  createUser(@Body() user: CreateUserDto, @Req() request: Request & { now: string }) {
     console.log("dentro del endpoint:", request.now);
     return this.usersDbService.saveUser({...user, createdAt: request.now});
   }
