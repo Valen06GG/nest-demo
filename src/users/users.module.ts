@@ -6,6 +6,8 @@ import { LoggerMiddleware } from "src/middlewares/logger.middleware";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "./users.entity";
 import { UsersDbService } from "./usersDB.service";
+import { CloudinaryConfig } from "src/config/cloudinary";
+import { CloudinaryService } from "./cloudinary.service";
 
 
 
@@ -15,6 +17,8 @@ import { UsersDbService } from "./usersDB.service";
         UsersService,
         UsersDbService,
         UsersRepository,
+        CloudinaryConfig,
+        CloudinaryService,
          {
              provide: 'API_USERS',
              useFactory: async () => {

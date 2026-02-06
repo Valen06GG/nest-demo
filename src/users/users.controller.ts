@@ -1,15 +1,22 @@
-import { Body, Controller, Delete, Get, Headers, HttpException, HttpStatus, NotFoundException, Param, ParseUUIDPipe, Post, Put, Query, Req, Res, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, FileTypeValidator, Get, Headers, HttpException, HttpStatus, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, ParseUUIDPipe, Post, Put, Query, Req, Res, UploadedFile, UseGuards, UseInterceptors, UsePipes } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import type { Request, Response } from "express";
 import { AuthGuard } from "src/guards/auth.guards";
 import { DateAdderInterceptor } from "src/interceptors/date-adder.interceport";
 import { UsersDbService } from "./usersDB.service";
 import { CreateUserDto } from "./dtos/CreateUser.dto";
+import { CloudinaryService } from "./cloudinary.service";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { MinSizeValidatorPipe } from "src/pipes/min-size-validator.pipe";
 
 @Controller("users")
 @UseGuards(AuthGuard)
 export class UsersController {
-  constructor(private readonly usersService: UsersService, private usersDbService: UsersDbService,) {}
+  constructor(
+    private readonly usersService: UsersService, 
+    private usersDbService: UsersDbService, 
+    private readonly cloudinaryService: CloudinaryService
+  ) {}
   @Get()
   getUsers(@Query("name") name?: string) {
     if(name) {
@@ -26,10 +33,25 @@ export class UsersController {
     return "Este endpoint retorna el perfil del usuario";
   }
   
-  @Get("profile/images")
-  @UseGuards(AuthGuard)
-  getUserImages() {
-    return "Este endpoint retorna las imágenes del usuario";
+  @Post("profile/images")
+  @UseInterceptors(FileInterceptor("image"))
+  @UsePipes(MinSizeValidatorPipe)
+  // @UseGuards(AuthGuard)
+  getUserImages(@UploadedFile(
+    new ParseFilePipe({
+      validators: [
+        new MaxFileSizeValidator({
+          maxSize: 100000,
+          message: "El tamaño del archivo es demasiado grande. El tamaño máximo permitido es 100KB."
+        }),
+        new FileTypeValidator({
+          fileType: /(jpg|jpeg|png|webp)$/,
+        }),
+      ],
+    }),
+  ) file: Express.Multer.File) {
+    // return  this.cloudinaryService.uploadimage(file);
+    return file;
   }
   
   // @HttpCode(418)
