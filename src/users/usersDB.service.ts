@@ -24,4 +24,12 @@ export class UsersDbService {
     getUsers() {
       return this.usersRepository.find();
     }
+
+    getUserByEmail(email: string) {
+      return this.usersRepository.findOne({ where: { email } });
+    }
+
+    create(arg0: { password: any; id: string; name: string; email: string; createdAt: string; }) {
+        throw new Error("Method not implemented.");
+    }
 }

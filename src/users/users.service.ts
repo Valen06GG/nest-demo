@@ -4,7 +4,7 @@ import { User } from "./user.interface";
 
 @Injectable()
 export class UsersService {
-    
+
     constructor(
         private usersRepository: UsersRepository,
         @Inject('API_USERS') private apiUsers: User[],

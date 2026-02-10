@@ -8,6 +8,8 @@ import { CreateUserDto } from "./dtos/CreateUser.dto";
 import { CloudinaryService } from "./cloudinary.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { MinSizeValidatorPipe } from "src/pipes/min-size-validator.pipe";
+import { AuthService } from "./auth.service";
+import { UserCredentialsDto } from "./dtos/UserCredentials.dto";
 
 @Controller("users")
 @UseGuards(AuthGuard)
@@ -15,7 +17,8 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService, 
     private usersDbService: UsersDbService, 
-    private readonly cloudinaryService: CloudinaryService
+    private readonly cloudinaryService: CloudinaryService,
+    private readonly authService: AuthService
   ) {}
   @Get()
   getUsers(@Query("name") name?: string) {
@@ -26,10 +29,13 @@ export class UsersController {
   }
 
   @Get("profile") 
-  getUserProfile(@Headers("token") token?: string) {
-    if(token != "1234") {
-      return "Sin acceso";
-    }
+  @UseGuards(AuthGuard)
+  getUserProfile(/*@Headers("token") token: string*/  @Req() request: Request & { user: any },
+) {
+    // if(token != "1234") {
+    //   return "Sin acceso";
+    // }
+    console.log(request.user);
     return "Este endpoint retorna el perfil del usuario";
   }
   
@@ -90,11 +96,16 @@ export class UsersController {
     return user
   }
 
-  @Post()
+  @Post("signup")
   @UseInterceptors(DateAdderInterceptor)
   createUser(@Body() user: CreateUserDto, @Req() request: Request & { now: string }) {
     console.log("dentro del endpoint:", request.now);
-    return this.usersDbService.saveUser({...user, createdAt: request.now});
+    return this.authService.signUp({...user, createdAt: request.now});
+  }
+
+  @Post("signin")
+  async signIn( @Body() user: UserCredentialsDto ) {
+    return this.authService.signIn( user.email, user.password);
   }
 
   @Put() 

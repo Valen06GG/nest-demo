@@ -6,14 +6,17 @@ import {v4 as uuid} from "uuid";
 })
 export class User {
     @PrimaryGeneratedColumn("uuid")
-    id: string = uuid()
+    id: string = uuid();
 
     @Column()
-    name: string
+    name: string;
 
     @Column()
-    email: string
+    email: string;
 
     @Column()
-    createdAt: string
+    password: string;
+
+    @Column()
+    createdAt: string;
 }

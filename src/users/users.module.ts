@@ -8,6 +8,7 @@ import { User } from "./users.entity";
 import { UsersDbService } from "./usersDB.service";
 import { CloudinaryConfig } from "src/config/cloudinary";
 import { CloudinaryService } from "./cloudinary.service";
+import { AuthService } from "./auth.service";
 
 
 
@@ -19,6 +20,7 @@ import { CloudinaryService } from "./cloudinary.service";
         UsersRepository,
         CloudinaryConfig,
         CloudinaryService,
+        AuthService,
          {
              provide: 'API_USERS',
              useFactory: async () => {
