@@ -10,6 +10,9 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { MinSizeValidatorPipe } from "src/pipes/min-size-validator.pipe";
 import { AuthService } from "./auth.service";
 import { UserCredentialsDto } from "./dtos/UserCredentials.dto";
+import { Roles } from "src/decorators/roles.decorator";
+import { Role } from "src/roles.enum";
+import { RolesGuard } from "src/guards/roles.guard";
 
 @Controller("users")
 @UseGuards(AuthGuard)
@@ -85,6 +88,13 @@ export class UsersController {
   getRequest(@Req() request: Request) {
     console.log(request);
     return "Esta ruta loguea el request";
+  }
+
+  @Get("admin")
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  getAdmin() {
+    return "Ruta protegida";
   }
   
   @Get(":id")
