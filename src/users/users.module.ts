@@ -9,6 +9,7 @@ import { UsersDbService } from "./usersDB.service";
 import { CloudinaryConfig } from "src/config/cloudinary";
 import { CloudinaryService } from "./cloudinary.service";
 import { AuthService } from "./auth.service";
+import { requiresAuth } from "express-openid-connect";
 
 
 
@@ -41,5 +42,6 @@ import { AuthService } from "./auth.service";
 export class UsersModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
         consumer.apply(LoggerMiddleware).forRoutes('users');
+        consumer.apply(requiresAuth()).forRoutes("users/auth0/protected")
     }
 }

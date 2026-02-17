@@ -15,7 +15,7 @@ import { Role } from "src/roles.enum";
 import { RolesGuard } from "src/guards/roles.guard";
 
 @Controller("users")
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 export class UsersController {
   constructor(
     private readonly usersService: UsersService, 
@@ -95,6 +95,12 @@ export class UsersController {
   @UseGuards(AuthGuard, RolesGuard)
   getAdmin() {
     return "Ruta protegida";
+  }
+
+  @Get("auth0/protected")
+  getAuth0Protected(@Req() req: Request) {
+    console.log(req.oidc);
+    return JSON.stringify(req.oidc.user);
   }
   
   @Get(":id")
