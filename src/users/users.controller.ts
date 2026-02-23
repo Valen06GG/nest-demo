@@ -13,9 +13,11 @@ import { UserCredentialsDto } from "./dtos/UserCredentials.dto";
 import { Roles } from "src/decorators/roles.decorator";
 import { Role } from "src/roles.enum";
 import { RolesGuard } from "src/guards/roles.guard";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
+@ApiTags("Users")
 @Controller("users")
-// @UseGuards(AuthGuard)
+@UseGuards(AuthGuard)
 export class UsersController {
   constructor(
     private readonly usersService: UsersService, 
@@ -31,6 +33,7 @@ export class UsersController {
     return this.usersDbService.getUsers();
   }
 
+  @ApiBearerAuth()
   @Get("profile") 
   @UseGuards(AuthGuard)
   getUserProfile(/*@Headers("token") token: string*/  @Req() request: Request & { user: any },
@@ -42,10 +45,11 @@ export class UsersController {
     return "Este endpoint retorna el perfil del usuario";
   }
   
+  @ApiBearerAuth()
   @Post("profile/images")
   @UseInterceptors(FileInterceptor("image"))
   @UsePipes(MinSizeValidatorPipe)
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   getUserImages(@UploadedFile(
     new ParseFilePipe({
       validators: [

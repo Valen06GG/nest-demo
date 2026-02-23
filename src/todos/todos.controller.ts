@@ -2,7 +2,9 @@ import { Body, Controller, Get, Param, Post, UploadedFile, UseInterceptors, UseP
 import { TodosService } from "./todos.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { FilesService } from "./files.service";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags("Todos")
 @Controller("todos")
 export class TodosController {
   constructor(private readonly todosService:TodosService,
